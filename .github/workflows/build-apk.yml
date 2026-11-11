@@ -22,14 +22,12 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v4
-      with:
-        cmdline-tools-version: "14742923"
 
-    - name: Make Gradle Wrapper Executable
-      run: chmod +x gradlew
+    - name: Install Gradle
+      uses: gradle/actions/setup-gradle@v3
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug
+      run: gradle assembleDebug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
