@@ -21,10 +21,9 @@ jobs:
         java-version: '17'
 
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+      uses: android-actions/setup-android@v4
       with:
-        accept-android-sdk-licenses: true
-        cmdline-tools-version: "110.7670305"
+        cmdline-tools-version: "14742923"
 
     - name: Make Gradle Wrapper Executable
       run: chmod +x gradlew
