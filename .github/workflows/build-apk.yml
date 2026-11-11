@@ -22,10 +22,9 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
-
-    - name: Accept Android SDK Licenses
-      run: |
-        yes | sdkmanager --licenses || true
+      with:
+        accept-android-sdk-licenses: true
+        cmdline-tools-version: "110.7670305"
 
     - name: Make Gradle Wrapper Executable
       run: chmod +x gradlew
