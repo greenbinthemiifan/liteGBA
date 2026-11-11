@@ -1,30 +1,84 @@
 package com.litegba
 
-import android.content.Context
-import android.util.Log
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.provider.OpenableColumns
+import android.widget.Button
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 
-class EmulatorEngine {
-    companion object {
-        private const val TAG = "EmulatorEngine"
+class MainActivity : AppCompatActivity() {
 
-        /**
-         * Loads the pre-built libmgba_libretro.so native library.
-         * Returns true if successful, or triggers the error handler if it fails.
-         */
-        fun initLibrary(context: Context): Boolean {
-            return try {
-                System.loadLibrary("mgba_libretro")
-                Log.d(TAG, "libmgba_libretro loaded successfully!")
-                true
-            } catch (e: UnsatisfiedLinkError) {
-                Log.e(TAG, "Failed to load native library: ${e.message}")
-                ErrorHandler.handle(
-                    context,
-                    ErrorHandler.ErrorCode.ERR_NATIVE_LIB_LOAD,
-                    e.localizedMessage ?: "Missing or incompatible architecture library"
-                )
-                false
+    private val biosPickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                validateAndLoadBios(uri)
             }
         }
+    }
+
+    private val romPickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                loadRom(uri)
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // 1. Initialize and load the native library safely using the error handler
+        EmulatorEngine.initLibrary(this)
+
+        val btnSelectBios = findViewById<Button>(R.id.btnSelectBios)
+        val btnSelectRom = findViewById<Button>(R.id.btnSelectRom)
+
+        btnSelectBios.setOnClickListener {
+            openFilePicker(biosPickerLauncher)
+        }
+
+        btnSelectRom.setOnClickListener {
+            openFilePicker(romPickerLauncher)
+        }
+    }
+
+    private fun openFilePicker(launcher: androidx.activity.result.ActivityResultLauncher<Intent>) {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+        }
+        launcher.launch(intent)
+    }
+
+    private fun validateAndLoadBios(uri: Uri) {
+        val fileSize = contentResolver.openAssetFileDescriptor(uri, "r")?.use { it.length } ?: 0L
+        
+        // 2. Validate that the BIOS is a byte-perfect 16 KB (16384 bytes)
+        if (fileSize == 16384L) {
+            Toast.makeText(this, "Valid 16 KB BIOS Selected!", Toast.LENGTH_SHORT).show()
+        } else {
+            // Trigger the centralized error handler if the file size is wrong
+            ErrorHandler.handle(
+                this, 
+                ErrorHandler.ErrorCode.ERR_BIOS_INVALID_SIZE, 
+                "Found $fileSize bytes"
+            )
+        }
+    }
+
+    private fun loadRom(uri: Uri) {
+        var romName = "Unknown ROM"
+        contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (cursor.moveToFirst() && nameIndex != -1) {
+                romName = cursor.getString(nameIndex)
+            }
+        }
+        Toast.makeText(this, "ROM Loaded: $romName", Toast.LENGTH_SHORT).show()
     }
 }
