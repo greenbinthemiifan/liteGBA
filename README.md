@@ -1,13 +1,10 @@
 # liteGBA
-
-A lightweight Game Boy Advance (GBA) emulator built for Android.
-
-## Overview
-`liteGBA` is a clean, minimal mobile emulator project designed to run GBA ROMs smoothly using an optimized native backend.
-
-## Project Structure
-- `app/src/main/java/`: Kotlin Android frontend, UI layouts, and file pickers.
-- `app/src/main/cpp/`: Native C++ code, JNI bindings, and emulation core integration.
-
-## License
-This project is open-source and intended for educational and hobbyist development.
+a fan made gba emulator using liberties mgba core
+## license 
+this is not affiliated with nintendo, liberto or mgba's team. this is an open source project made for android.
+## sources 
+mgba core: (here)[https://buildbot.libretro.com/]
+(yea thats literally all the sources)
+## info
+issues with be open! i won't really be active so just make any issue im not going to close it (most likely)
+made with love - green.bin
