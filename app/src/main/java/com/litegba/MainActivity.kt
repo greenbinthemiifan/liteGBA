@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Initialize the native emulation engine library (loads libmgba_libretro.so)
-        EmulatorEngine.initLibrary()
+        EmulatorEngine.initLibrary(this)
 
         val btnSelectBios = findViewById<Button>(R.id.btnSelectBios)
         val btnSelectRom = findViewById<Button>(R.id.btnSelectRom)
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun validateAndLoadBios(uri: Uri) {
         val fileSize = contentResolver.openAssetFileDescriptor(uri, "r")?.use { it.length } ?: 0L
-        
+
         if (fileSize == 16384L) {
             Toast.makeText(this, "Valid 16 KB BIOS Selected!", Toast.LENGTH_SHORT).show()
         } else {
