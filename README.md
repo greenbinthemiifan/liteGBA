@@ -1,5 +1,7 @@
 # liteGBA
 a fan made gba emulator using liberties mgba core
+icon: ![icon](icon/playstore-icon.png)
+
 ## license 
 this is not affiliated with nintendo, liberto or mgba's team. this is an open source project made for android.
 ## sources 
